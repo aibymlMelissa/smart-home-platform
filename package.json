@@ -1,0 +1,32 @@
+{
+  "name": "smart-home-platform",
+  "version": "1.0.0",
+  "description": "Home Assistant Platform - Smart Home Automation System",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "clean": "turbo run clean && rm -rf node_modules",
+    "backend:dev": "cd apps/backend && npm run dev",
+    "frontend:dev": "cd apps/frontend && npm run dev",
+    "reseller-hub:dev": "cd apps/reseller-hub && npm run dev",
+    "start:all": "./scripts/start-all.sh",
+    "dev:all": "./scripts/start-all.sh",
+    "stop:all": "./scripts/stop-all.sh",
+    "setup": "npm install && npm run build"
+  },
+  "devDependencies": {
+    "turbo": "^1.10.0",
+    "typescript": "^5.3.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}

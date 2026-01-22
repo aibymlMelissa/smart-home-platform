@@ -1,0 +1,13 @@
+
+> @smart-home/reseller-hub@1.0.0 dev
+> vite --port 3001
+
+
+  VITE v5.4.21  ready in 113 ms
+
+  ➜  Local:   http://localhost:3001/
+  ➜  Network: use --host to expose
+3:10:45 pm [vite] hmr update /src/pages/AgentDetailPage.tsx, /src/styles/index.css
+3:10:50 pm [vite] hmr update /src/pages/InventoryPage.tsx, /src/styles/index.css
+3:10:56 pm [vite] hmr update /src/pages/OrdersPage.tsx, /src/styles/index.css
+3:11:01 pm [vite] hmr update /src/pages/OutletsPage.tsx, /src/styles/index.css

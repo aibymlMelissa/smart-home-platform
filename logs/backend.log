@@ -1,0 +1,119 @@
+
+> @smart-home/backend@1.0.0 dev
+> tsx watch src/index.ts
+
+[32minfo[39m: Connecting to database... {"timestamp":"2026-01-22T02:13:33.382Z"}
+[32minfo[39m: Database pool created successfully {"timestamp":"2026-01-22T02:13:33.397Z"}
+[32minfo[39m: Database connected successfully {"timestamp":"2026-01-22T02:13:33.397Z"}
+[32minfo[39m: Connecting to Redis... {"timestamp":"2026-01-22T02:13:33.397Z"}
+[32minfo[39m: Redis connected successfully {"timestamp":"2026-01-22T02:13:33.399Z"}
+[32minfo[39m: Redis connected successfully {"timestamp":"2026-01-22T02:13:33.402Z"}
+[32minfo[39m: Connecting to MQTT broker... {"timestamp":"2026-01-22T02:13:33.402Z"}
+[33mwarn[39m: MQTT connection failed - continuing without MQTT: {"timestamp":"2026-01-22T02:13:33.418Z"}
+[32minfo[39m: MQTT broker connected successfully {"timestamp":"2026-01-22T02:13:33.419Z"}
+[32minfo[39m: Initializing WebSocket service... {"timestamp":"2026-01-22T02:13:33.419Z"}
+[32minfo[39m: WebSocket service initialized successfully {"timestamp":"2026-01-22T02:13:33.419Z"}
+[32minfo[39m: Initializing email service... {"timestamp":"2026-01-22T02:13:33.419Z"}
+[33mwarn[39m: Email service not configured - SMTP_HOST not set {"timestamp":"2026-01-22T02:13:33.419Z"}
+[32minfo[39m: Email service initialized {"timestamp":"2026-01-22T02:13:33.419Z"}
+[32minfo[39m: 
+╔═══════════════════════════════════════════════════════╗
+║                                                       ║
+║   Smart Home Platform Backend                        ║
+║                                                       ║
+║   Server running on: http://localhost:4000        ║
+║   Environment: development                 ║
+║   WebSocket: ws://localhost:4000/ws               ║
+║                                                       ║
+╚═══════════════════════════════════════════════════════╝
+         {"timestamp":"2026-01-22T02:13:33.420Z"}
+[32minfo[39m: GET /health {"timestamp":"2026-01-22T02:13:33.738Z"}
+[32minfo[39m: POST /api/v1/auth/login {"timestamp":"2026-01-22T02:14:21.309Z"}
+[32minfo[39m: User logged in: demo@product.com {"timestamp":"2026-01-22T02:14:21.429Z"}
+[32minfo[39m: GET /api/v1/resellers/a1b2c3d4-e5f6-7890-abcd-ef1234567890 {"timestamp":"2026-01-22T02:14:21.438Z"}
+[32minfo[39m: GET /api/v1/re10:15:59 am [tsx] change in ./src/routes/reseller.routes.ts Process hasn't exited. Killing process...
+nfo[39m: GET /api/v1/agents/reseller/a1b2c3d4-e5f6-7890-abcd-ef1234567890 {"timestamp":"2026-01-22T02:14:21.486Z"}
+[31merror[39m: Database query error: {"error":{"code":"42702","file":"parse_relation.c","length":116,"line":"820","name":"error","position":"220","routine":"scanRTEForColumn","severity":"ERROR"},"query":"\n        SELECT\n          COUNT(*) FILTER (WHERE status = 'pending') as pending,\n          COUNT(*) FILTER (WHERE status = 'completed') as completed,\n          COALESCE(SUM(total) FILTER (WHERE status = 'completed' AND created_at > NOW() - INTERVAL '30 days'), 0) as revenue_30d\n        FROM retail_orders ro\n        JOIN outlets o ON ro.outlet_id = o.id\n        WHERE o.reseller_id = $1\n      ","timestamp":"2026-01-22T02:14:21.505Z"}
+[31merror[39m: Unhandled error: column reference "created_at" is ambiguous {"code":"42702","file":"parse_relation.c","length":116,"line":"820","name":"error","position":"220","routine":"scanRTEFor10:15:59 am [tsx] change in ./src/routes/reseller.routes.ts Restarting...
+10:16:04 am [tsx] Process didn't exit in 5s. Force killing...
+modules/pg-pool/index.js:45:11\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async Database.query (/Users/drpanda/smart-home-platform/apps/backend/src/services/database.service.ts:40:22)\n    at async Promise.all (index 2)\n    at async <anonymous> (/Users/drpanda/smart-home-platform/apps/backend/src/routes/reseller.routes.ts:192:50)","timestamp":"2026-01-22T02:14:21.506Z"}
+[32minfo[39m: GET /api/v1/resellers/a1b2c3d4-e5f6-7890-abcd-ef1234567890/dashboard {"timestamp":"2026-01-22T02:14:21.508Z"}
+[31merror[39m: Database query error: {"error":{"code":"42702","file":"parse_relation.c","length":116,"line":"820","name":"error","position":"220","routine":"scanRTEForColumn","severity":"ERROR"},"query":"\n        SELECT\n          COUNT(*) FILTER (WHERE status = 'pending') as pending,\n          COUNT(*) FILTER (WHERE status = 'completed') as completed,\n          COALESCE(SUM(total) FILTER (WHERE status = 'completed' AND created_at > NOW() - INTERVAL '30 days'), 0) as revenue_30d\n        FROM retail_orders ro\n        JOIN outlets o ON ro.outlet_id = o.id\n        WHERE o.reseller_id = $1\n      ","timestamp":"2026-01-22T02:14:21.513Z"}
+[31merror[39m: Unhandled error: column reference "created_at" is ambiguous {"code":"42702","file":"parse_relation.c","length":116,"line":"820","name":"error","position":"220","routine":"scanRTEForColumn","severity":"ERROR","stack":"error: column reference \"created_at\" is ambiguous\n    at /Users/drpanda/smart-home-platform/node_modules/pg-pool/index.js:45:11\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async Database.query (/Users/drpanda/smart-home-platform/apps/backend/src/services/database.service.ts:40:22)\n    at async Promise.all (index 2)\n    at async <anonymous> (/Users/drpanda/smart-home-platform/apps/backend/src/routes/reseller.routes.ts:192:50)","timestamp":"2026-01-22T02:14:21.513Z"}
+[32minfo[39m: GET /api/v1/agents/reseller/a1b2c3d4-e5f6-7890-abcd-ef1234567890 {"timestamp":"2026-01-22T02:14:21.517Z"}
+10:15:59 am [tsx] change in ./src/routes/reseller.routes.ts Restarting...
+[32minfo[39m: Shutting down gracefully... {"timestamp":"2026-01-22T02:15:59.968Z"}
+[32minfo[39m: HTTP server closed {"timestamp":"2026-01-22T02:15:59.969Z"}
+[32minfo[39m: Database pool closed {"timestamp":"2026-01-22T02:15:59.970Z"}
+[32minfo[39m: Redis disconnected {"timestamp":"2026-01-22T02:15:59.970Z"}
+[32minfo[39m: All services disconnected. Goodbye! {"timestamp":"2026-01-22T02:15:59.971Z"}
+c[32minfo[39m: Connecting to database... {"timestamp":"2026-01-22T02:16:00.612Z"}
+[32minfo[39m: Database pool created successfully {"timestamp":"2026-01-22T02:16:00.627Z"}
+[32minfo[39m: Database connected successfully {"timestamp":"2026-01-22T02:16:00.627Z"}
+[32minfo[39m: Connecting to Redis... {"timestamp":"2026-01-22T02:16:00.627Z"}
+[32minfo[39m: Redis connected successfully {"timestamp":"2026-01-22T02:16:00.629Z"}
+[32minfo[39m: Redis connected successfully {"timestamp":"2026-01-22T02:16:00.631Z"}
+[32minfo[39m: Connecting to MQTT broker... {"timestamp":"2026-01-22T02:16:00.631Z"}
+[33mwarn[39m: MQTT connection failed - continuing without MQTT: {"timestamp":"2026-01-22T02:16:00.643Z"}
+[32minfo[39m: MQTT broker connected successfully {"timestamp":"2026-01-22T02:16:00.643Z"}
+[32minfo[39m: Initializing WebSocket service... {"timestamp":"2026-01-22T02:16:00.643Z"}
+[32minfo[39m: WebSocket service initialized successfully {"timestamp":"2026-01-22T02:16:00.643Z"}
+[32minfo[39m: Initializing email service... {"timestamp":"2026-01-22T02:16:00.643Z"}
+[33mwarn[39m: Email service not configured - SMTP_HOST not set {"timestamp":"2026-01-22T02:16:00.643Z"}
+[32minfo[39m: Email service initialized {"timestamp":"2026-01-22T02:16:00.643Z"}
+node:events:486
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::4000
+    at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+    at listenInCluster (node:net:1997:12)
+    at Server.listen (node:net:2102:7)
+    at Server.start (/Users/drpanda/smart-home-platform/apps/backend/src/index.ts:160:23)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+Emitted 'error' event on WebSocketServer instance at:
+    at Server.emit (node:events:508:28)
+    at emitErrorNT (node:net:1976:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'EADDRINUSE',
+  errno: -48,
+  syscall: 'listen',
+  address: '::',
+  port: 4000
+}
+
+Node.js v24.7.0
+successfully {"timestamp":"2026-01-22T02:16:00.574Z"}
+[32minfo[39m: Connecting to Redis... {"timestamp":"2026-01-22T02:16:00.574Z"}
+[32minfo[39m: Redis connected successfully {"timestamp":"2026-01-22T02:16:00.576Z"}
+[32minfo[39m: Redis connected successfully {"timestamp":"2026-01-22T02:16:00.579Z"}
+[32minfo[39m: Connecting to MQTT broker... {"timestamp":"2026-01-22T02:16:00.579Z"}
+[33mwarn[39m: MQTT connection failed - continuing without MQTT: {"timestamp":"2026-01-22T02:16:00.594Z"}
+[32minfo[39m: MQTT broker connected successfully {"timestamp":"2026-01-22T02:16:00.594Z"}
+[32minfo[39m: Initializing WebSocket service... {"timestamp":"2026-01-22T02:16:00.594Z"}
+[32minfo[39m: WebSocket service initialized successfully {"timestamp":"2026-01-22T02:16:00.594Z"}
+[32minfo[39m: Initializing email service... {"timestamp":"2026-01-22T02:16:00.594Z"}
+[33mwarn[39m: Email service not configured - SMTP_HOST not set {"timestamp":"2026-01-22T02:16:00.594Z"}
+[32minfo[39m: Email service initialized {"timestamp":"2026-01-22T02:16:00.594Z"}
+node:events:486
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::4000
+    at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+    at listenInCluster (node:net:1997:12)
+    at Server.listen (node:net:2102:7)
+    at Server.start (/Users/drpanda/smart-home-platform/apps/backend/src/index.ts:160:23)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+Emitted 'error' event on WebSocketServer instance at:
+    at Server.emit (node:events:508:28)
+    at emitErrorNT (node:net:1976:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'EADDRINUSE',
+  errno: -48,
+  syscall: 'listen',
+  address: '::',
+  port: 4000
+}
+
+Node.js v24.7.0

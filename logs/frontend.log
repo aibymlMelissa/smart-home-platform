@@ -1,0 +1,19 @@
+
+> @smart-home/frontend@1.0.0 dev
+> vite
+
+
+  VITE v5.4.21  ready in 290 ms
+
+  ➜  Local:   http://localhost:3000/
+  ➜  Network: use --host to expose
+3:07:39 pm [vite] hmr update /src/components/Layout.tsx, /src/styles/index.css
+3:07:48 pm [vite] hmr update /src/pages/AutomationsPage.tsx, /src/styles/index.css
+3:07:48 pm [vite] hmr update /src/pages/DashboardPage.tsx, /src/styles/index.css
+3:07:48 pm [vite] hmr update /src/pages/LoginPage.tsx, /src/styles/index.css
+3:07:48 pm [vite] hmr update /src/pages/SignupPage.tsx, /src/styles/index.css
+3:08:02 pm [vite] hmr update /src/pages/DevicesPage.tsx, /src/styles/index.css
+3:08:46 pm [vite] hmr update /src/pages/DashboardPage.tsx, /src/styles/index.css
+3:08:58 pm [vite] hmr update /src/pages/LoginPage.tsx, /src/styles/index.css
+3:09:09 pm [vite] hmr update /src/pages/SignupPage.tsx, /src/styles/index.css
+3:09:20 pm [vite] hmr update /src/pages/DevicesPage.tsx, /src/styles/index.css
