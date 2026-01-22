@@ -100,4 +100,14 @@ router.post(
   authController.verifyEmail.bind(authController)
 );
 
+/**
+ * @route   POST /api/v1/auth/guest
+ * @desc    Guest login - no password required, for potential customers to explore
+ * @access  Public
+ */
+router.post(
+  '/guest',
+  authController.guestLogin.bind(authController)
+);
+
 export default router;

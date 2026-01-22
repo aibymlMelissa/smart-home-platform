@@ -385,6 +385,89 @@ export class AuthController {
   }
 
   /**
+   * Guest login - no password required
+   * Used for potential customers to explore the platform
+   */
+  async guestLogin(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const guestEmail = 'guest@smarthome.service';
+
+      // Find or create guest user
+      let result = await DatabaseService.query(
+        `SELECT id, email, first_name, last_name, phone_number, role, is_active, user_type
+         FROM users WHERE email = $1`,
+        [guestEmail]
+      );
+
+      let user;
+
+      if (result.rows.length === 0) {
+        // Create guest user if doesn't exist
+        const createResult = await DatabaseService.query(
+          `INSERT INTO users (email, password_hash, first_name, last_name, role, user_type, is_active)
+           VALUES ($1, $2, $3, $4, $5, $6, $7)
+           RETURNING id, email, first_name, last_name, phone_number, role, user_type, is_active`,
+          [guestEmail, 'guest-no-password', 'Guest', 'User', 'guest', 'household', true]
+        );
+        user = createResult.rows[0];
+        logger.info(`Guest user created: ${guestEmail}`);
+      } else {
+        user = result.rows[0];
+      }
+
+      if (!user.is_active) {
+        throw new AppError('Guest account is deactivated', 403);
+      }
+
+      // Generate tokens with short expiry for guest
+      const accessToken = jwt.sign(
+        { userId: user.id, role: 'guest' },
+        process.env.JWT_SECRET || 'default-secret',
+        { expiresIn: '24h' } // Guest tokens expire in 24 hours
+      );
+      const refreshToken = this.generateRefreshToken(user.id);
+
+      // Store refresh token in Redis with shorter expiry
+      await RedisService.set(
+        `refresh_token:${user.id}`,
+        refreshToken,
+        24 * 60 * 60 // 24 hours for guest
+      );
+
+      // Update last login
+      await DatabaseService.query(
+        'UPDATE users SET last_login = NOW() WHERE id = $1',
+        [user.id]
+      );
+
+      logger.info(`Guest user logged in: ${guestEmail}`);
+
+      res.json({
+        success: true,
+        message: 'Guest login successful',
+        data: {
+          user: {
+            id: user.id,
+            email: user.email,
+            firstName: user.first_name,
+            lastName: user.last_name,
+            phoneNumber: user.phone_number,
+            role: 'guest',
+            userType: user.user_type || 'household',
+            isGuest: true,
+          },
+          tokens: {
+            accessToken,
+            refreshToken,
+          },
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
    * Generate access token
    */
   private generateAccessToken(userId: string, role: string): string {

@@ -5,6 +5,7 @@ import './styles/index.css';
 import { useAuthStore } from './stores/authStore';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
+import GuestLandingPage from './pages/GuestLandingPage';
 import DashboardPage from './pages/DashboardPage';
 import DevicesPage from './pages/DevicesPage';
 import RoomsPage from './pages/RoomsPage';
@@ -17,13 +18,19 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
 }
 
+function PublicRoute({ children }: { children: React.ReactNode }) {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  return isAuthenticated ? <Navigate to="/" replace /> : <>{children}</>;
+}
+
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignupPage />} />
-        
+        <Route path="/welcome" element={<PublicRoute><GuestLandingPage /></PublicRoute>} />
+        <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
+        <Route path="/signup" element={<PublicRoute><SignupPage /></PublicRoute>} />
+
         <Route
           path="/"
           element={

@@ -86,6 +86,11 @@ class ApiService {
     return response.data;
   }
 
+  async guestLogin() {
+    const response = await this.api.post('/auth/guest');
+    return response.data;
+  }
+
   async getCurrentUser() {
     const response = await this.api.get('/auth/me');
     return response.data;

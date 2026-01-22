@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Home, Mail, Lock, AlertCircle } from 'lucide-react';
+import { Home, Mail, Lock, AlertCircle, UserCircle } from 'lucide-react';
 import { useAuthStore } from '../stores/authStore';
 import { apiService } from '../services/api';
 
@@ -19,6 +19,7 @@ export default function LoginPage() {
   const login = useAuthStore((state) => state.login);
   const [error, setError] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isGuestLoading, setIsGuestLoading] = useState(false);
 
   const {
     register,
@@ -44,6 +45,25 @@ export default function LoginPage() {
       setError(err.response?.data?.message || 'Login failed. Please try again.');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleGuestLogin = async () => {
+    try {
+      setIsGuestLoading(true);
+      setError('');
+
+      const response = await apiService.guestLogin();
+
+      if (response.success) {
+        const { user, tokens } = response.data;
+        login(user, tokens.accessToken, tokens.refreshToken);
+        navigate('/');
+      }
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Guest login failed. Please try again.');
+    } finally {
+      setIsGuestLoading(false);
     }
   };
 
@@ -138,11 +158,35 @@ export default function LoginPage() {
             </div>
           </div>
 
+          {/* Guest Access */}
+          <div className="mt-4 p-4 bg-green-500/10 border border-green-500/30 rounded-lg">
+            <p className="text-sm font-medium text-green-300 mb-2">Guest Access</p>
+            <p className="text-sm text-gray-300 mb-3">
+              Explore the platform without an account
+            </p>
+            <button
+              type="button"
+              onClick={handleGuestLogin}
+              disabled={isGuestLoading}
+              className="w-full flex items-center justify-center gap-2 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
+            >
+              <UserCircle className="w-4 h-4" />
+              {isGuestLoading ? 'Entering...' : 'Continue as Guest'}
+            </button>
+          </div>
+
           {/* Sign Up Link */}
           <div className="mt-6 text-center text-sm text-gray-300">
             Don't have an account?{' '}
             <Link to="/signup" className="text-primary-400 hover:text-primary-300 font-medium transition-colors">
               Sign up
+            </Link>
+          </div>
+
+          {/* Learn More Link */}
+          <div className="mt-2 text-center text-sm">
+            <Link to="/welcome" className="text-green-400 hover:text-green-300 transition-colors">
+              Learn how Smart Home Platform works →
             </Link>
           </div>
         </div>
