@@ -7,8 +7,10 @@
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "db:migrate": "tsx src/scripts/migrate.ts",
-    "db:migrate:care": "tsx src/scripts/migrate-aged-care.ts",
+    "db:migrate": "node dist/scripts/migrate.js",
+    "db:migrate:care": "node dist/scripts/migrate-aged-care.js",
+    "db:migrate:dev": "tsx src/scripts/migrate.ts",
+    "db:migrate:care:dev": "tsx src/scripts/migrate-aged-care.ts",
     "db:seed": "tsx src/scripts/seed.ts",
     "lint": "eslint src --ext .ts",
     "test": "jest"
