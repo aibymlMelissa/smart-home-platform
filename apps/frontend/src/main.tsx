@@ -7,9 +7,9 @@ import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import GuestLandingPage from './pages/GuestLandingPage';
 import DashboardPage from './pages/DashboardPage';
-import DevicesPage from './pages/DevicesPage';
-import RoomsPage from './pages/RoomsPage';
-import AutomationsPage from './pages/AutomationsPage';
+import RemindersPage from './pages/RemindersPage';
+import FamilyPage from './pages/FamilyPage';
+import HelpPage from './pages/HelpPage';
 import SettingsPage from './pages/SettingsPage';
 import Layout from './components/Layout';
 
@@ -18,19 +18,16 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
 }
 
-function PublicRoute({ children }: { children: React.ReactNode }) {
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-  return isAuthenticated ? <Navigate to="/" replace /> : <>{children}</>;
-}
-
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/welcome" element={<PublicRoute><GuestLandingPage /></PublicRoute>} />
-        <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
-        <Route path="/signup" element={<PublicRoute><SignupPage /></PublicRoute>} />
+        {/* Public landing page - first thing visitors see */}
+        <Route path="/welcome" element={<GuestLandingPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
 
+        {/* Protected dashboard for logged-in users */}
         <Route
           path="/"
           element={
@@ -40,9 +37,9 @@ function App() {
           }
         >
           <Route index element={<DashboardPage />} />
-          <Route path="devices" element={<DevicesPage />} />
-          <Route path="rooms" element={<RoomsPage />} />
-          <Route path="automations" element={<AutomationsPage />} />
+          <Route path="reminders" element={<RemindersPage />} />
+          <Route path="family" element={<FamilyPage />} />
+          <Route path="help" element={<HelpPage />} />
           <Route path="settings" element={<SettingsPage />} />
         </Route>
       </Routes>

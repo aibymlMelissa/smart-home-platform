@@ -12,6 +12,7 @@ import {
   X,
   Building2,
   ChevronDown,
+  Users,
 } from 'lucide-react';
 import { useResellerStore } from '../stores/resellerStore';
 
@@ -26,6 +27,7 @@ const navigation = [
   { name: 'Inventory', href: '/inventory', icon: Package },
   { name: 'Orders', href: '/orders', icon: ShoppingCart },
   { name: 'Analytics', href: '/analytics', icon: BarChart3 },
+  { name: 'Key Roles', href: '/roles', icon: Users },
 ];
 
 export default function Layout({ children }: LayoutProps) {

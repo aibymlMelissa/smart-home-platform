@@ -17,6 +17,18 @@ async function seed(): Promise<void> {
   console.log('Starting database seeding...\n');
 
   try {
+    // Create admin user (EdmundLam)
+    const adminId = uuidv4();
+    const adminHashedPassword = await bcrypt.hash('Admin2@26', 12);
+
+    await pool.query(
+      `INSERT INTO users (id, email, password_hash, first_name, last_name, role, user_type)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
+       ON CONFLICT (email) DO NOTHING`,
+      [adminId, 'EdmundLam', adminHashedPassword, 'Edmund', 'Lam', 'admin', 'consultant']
+    );
+    console.log('  [OK] Created admin user (EdmundLam / Admin2@26)');
+
     // Create demo user
     const userId = uuidv4();
     const hashedPassword = await bcrypt.hash('Demo123456', 12);
@@ -28,6 +40,34 @@ async function seed(): Promise<void> {
       [userId, 'demo@example.com', hashedPassword, 'Demo', 'User', 'user']
     );
     console.log('  [OK] Created demo user (demo@example.com / Demo123456)');
+
+    // Create demo reseller company first
+    const resellerId = uuidv4();
+    await pool.query(
+      `INSERT INTO resellers (id, company_name, contact_email, contact_phone, city, country, tier)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
+       ON CONFLICT (contact_email) DO NOTHING`,
+      [resellerId, 'Demo Products Pty Ltd', 'contact@product.com', '03 9000 0000', 'Melbourne', 'Australia', 'gold']
+    );
+    console.log('  [OK] Created demo reseller company (Demo Products Pty Ltd)');
+
+    // Get reseller ID (in case it already existed)
+    const resellerResult = await pool.query(
+      `SELECT id FROM resellers WHERE contact_email = 'contact@product.com'`
+    );
+    const actualResellerId = resellerResult.rows[0]?.id || resellerId;
+
+    // Create demo reseller user
+    const resellerUserId = uuidv4();
+    const resellerHashedPassword = await bcrypt.hash('product123', 12);
+
+    await pool.query(
+      `INSERT INTO users (id, email, password_hash, first_name, last_name, role, user_type, reseller_id)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+       ON CONFLICT (email) DO NOTHING`,
+      [resellerUserId, 'demo@product.com', resellerHashedPassword, 'Demo', 'Reseller', 'user', 'reseller', actualResellerId]
+    );
+    console.log('  [OK] Created demo reseller user (demo@product.com / product123)');
 
     // Get the user ID (in case it already existed)
     const userResult = await pool.query(

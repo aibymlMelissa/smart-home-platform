@@ -11,6 +11,7 @@ import AgentDetailPage from './pages/AgentDetailPage';
 import InventoryPage from './pages/InventoryPage';
 import OrdersPage from './pages/OrdersPage';
 import AnalyticsPage from './pages/AnalyticsPage';
+import RolesPage from './pages/RolesPage';
 import './styles/index.css';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -41,6 +42,7 @@ function App() {
                   <Route path="/inventory" element={<InventoryPage />} />
                   <Route path="/orders" element={<OrdersPage />} />
                   <Route path="/analytics" element={<AnalyticsPage />} />
+                  <Route path="/roles" element={<RolesPage />} />
                 </Routes>
               </Layout>
             </ProtectedRoute>

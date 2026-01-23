@@ -18,6 +18,8 @@ import outletRoutes from './routes/outlet.routes';
 import agentRoutes from './routes/agent.routes';
 import inventoryRoutes from './routes/inventory.routes';
 import orderRoutes from './routes/order.routes';
+// SafeHome Aged Care routes
+import careRoutes from './routes/care.routes';
 
 // Import middleware
 import { errorHandler } from './middleware/errorHandler';
@@ -27,8 +29,11 @@ import rateLimiter from './middleware/rateLimiter';
 import { DatabaseService } from './services/database.service';
 import { RedisService } from './services/redis.service';
 import { mqttService } from './services/mqtt.service';
-import { WebSocketService } from './services/websocket.service';
+import { hubMqttService } from './services/hub-mqtt.service';
+import { WebSocketService, websocketService } from './services/websocket.service';
 import { emailService } from './services/email.service';
+import { activityDetectionService } from './services/activity-detection.service';
+import { alertService } from './services/alert.service';
 import logger from './utils/logger';
 
 dotenv.config();
@@ -106,6 +111,9 @@ class Server {
     this.app.use(`${apiPrefix}/inventory`, inventoryRoutes);
     this.app.use(`${apiPrefix}/orders`, orderRoutes);
 
+    // SafeHome Aged Care API routes
+    this.app.use(`${apiPrefix}/care`, careRoutes);
+
     // 404 handler
     this.app.use((req: Request, res: Response) => {
       res.status(404).json({
@@ -136,6 +144,12 @@ class Server {
       logger.info('Connecting to MQTT broker...');
       await mqttService.initialize();
       logger.info('MQTT broker connected successfully');
+
+      // Initialize Hub MQTT Service for aged care
+      logger.info('Initializing Hub MQTT service...');
+      await hubMqttService.initialize();
+      this.setupHubEventHandlers();
+      logger.info('Hub MQTT service initialized');
 
       // Initialize WebSocket
       logger.info('Initializing WebSocket service...');
@@ -181,6 +195,106 @@ class Server {
     }
   }
 
+  private setupHubEventHandlers(): void {
+    // Handle hub status updates
+    hubMqttService.on('hub:status', async (status) => {
+      try {
+        const { DatabaseService } = await import('./services/database.service');
+        await DatabaseService.query(
+          `UPDATE hubs
+           SET status = $2, firmware_version = $3, battery_level = $4,
+               is_on_battery = $5, wifi_strength = $6, last_seen_at = NOW(), updated_at = NOW()
+           WHERE serial_number = $1`,
+          [status.serialNumber, status.status, status.firmwareVersion,
+           status.batteryLevel, status.isOnBattery, status.wifiStrength]
+        );
+        logger.debug(`Hub status updated: ${status.serialNumber}`);
+      } catch (error) {
+        logger.error('Error updating hub status:', error);
+      }
+    });
+
+    // Handle device events
+    hubMqttService.on('device:event', async (event) => {
+      try {
+        const result = await activityDetectionService.processEvent({
+          hubId: event.hubId,
+          deviceId: event.deviceId,
+          eventType: event.eventType,
+          roomName: event.roomName,
+          sensorData: event.sensorData,
+          timestamp: event.timestamp,
+        });
+
+        // If anomaly detected, create alert
+        if (result.anomaly.isAnomaly && result.anomaly.suggestedAlert) {
+          const { DatabaseService } = await import('./services/database.service');
+          const hubResult = await DatabaseService.query(
+            `SELECT user_id FROM hubs WHERE id = $1`,
+            [event.hubId]
+          );
+          if (hubResult.rows[0]) {
+            await alertService.createAlert({
+              userId: hubResult.rows[0].user_id,
+              hubId: event.hubId,
+              activityEventId: result.eventId,
+              alertType: result.anomaly.suggestedAlert,
+              severity: result.anomaly.anomalyScore >= 0.9 ? 'critical' : 'high',
+              title: result.anomaly.reason || 'Unusual activity detected',
+              message: `Detected in ${event.roomName || 'unknown room'}`,
+            });
+          }
+        }
+      } catch (error) {
+        logger.error('Error processing device event:', error);
+      }
+    });
+
+    // Handle emergency alerts
+    hubMqttService.on('emergency', async (emergency) => {
+      try {
+        const { DatabaseService } = await import('./services/database.service');
+        const hubResult = await DatabaseService.query(
+          `SELECT id, user_id FROM hubs WHERE serial_number = $1 OR id = $1`,
+          [emergency.hubId]
+        );
+        if (hubResult.rows[0]) {
+          await alertService.handleEmergency(
+            hubResult.rows[0].user_id,
+            hubResult.rows[0].id,
+            emergency.source,
+            emergency.location
+          );
+        }
+      } catch (error) {
+        logger.error('Error handling emergency:', error);
+      }
+    });
+
+    // Handle check-ins
+    hubMqttService.on('checkin', async (checkIn) => {
+      try {
+        const { DatabaseService } = await import('./services/database.service');
+        const hubResult = await DatabaseService.query(
+          `SELECT id, user_id FROM hubs WHERE serial_number = $1 OR id = $1`,
+          [checkIn.hubId]
+        );
+        if (hubResult.rows[0]) {
+          await DatabaseService.query(
+            `INSERT INTO check_ins (user_id, hub_id, check_in_type, status)
+             VALUES ($1, $2, $3, $4)`,
+            [hubResult.rows[0].user_id, hubResult.rows[0].id, checkIn.type, checkIn.status]
+          );
+          logger.info(`Check-in recorded for user ${hubResult.rows[0].user_id}`);
+        }
+      } catch (error) {
+        logger.error('Error recording check-in:', error);
+      }
+    });
+
+    logger.info('Hub event handlers configured');
+  }
+
   private async shutdown(): Promise<void> {
     logger.info('Shutting down gracefully...');
 
@@ -191,6 +305,7 @@ class Server {
     await DatabaseService.disconnect();
     await RedisService.disconnect();
     mqttService.disconnect();
+    hubMqttService.disconnect();
 
     logger.info('All services disconnected. Goodbye!');
     process.exit(0);
