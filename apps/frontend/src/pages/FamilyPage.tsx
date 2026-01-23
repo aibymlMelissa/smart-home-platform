@@ -1,6 +1,5 @@
 import {
   Heart,
-  Phone,
   Video,
   MessageCircle,
   User,
