@@ -1,6 +1,6 @@
 # SafeHome Platform
 
-A smart home automation platform with aged care monitoring, designed for the Melbourne market.
+A smart home automation platform with aged care monitoring, designed for the Melbourne market. Please clhub ick on either the UserInterface know how Households interface with the safe home services and how resellers work with their hub and link with purchase, installation, remote monitoring and maintenance services
 
 ## Applications
 
