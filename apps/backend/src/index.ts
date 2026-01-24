@@ -60,9 +60,29 @@ class Server {
     this.app.use(helmet());
     
     // CORS - allow multiple origins
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'http://localhost:3001',
+      'https://frontend-aibymlcom.vercel.app',
+      'https://reseller-hub-sandy.vercel.app',
+      process.env.FRONTEND_URL,
+      process.env.RESELLER_HUB_URL,
+    ].filter(Boolean) as string[];
+
     this.app.use(
       cors({
-        origin: ['http://localhost:3000', 'http://localhost:3001'],
+        origin: (origin, callback) => {
+          // Allow requests with no origin (mobile apps, curl, etc)
+          if (!origin) return callback(null, true);
+          if (allowedOrigins.some(allowed => origin.startsWith(allowed.replace(/\/$/, '')))) {
+            return callback(null, true);
+          }
+          // Also allow any vercel.app subdomain for preview deployments
+          if (origin.includes('.vercel.app')) {
+            return callback(null, true);
+          }
+          callback(new Error('Not allowed by CORS'));
+        },
         credentials: true,
       })
     );
