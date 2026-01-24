@@ -7,18 +7,18 @@ A smart home automation platform with aged care monitoring, designed for the Mel
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│                      Raspberry Pi Hub                           │
-│                                                                  │
+│                      Raspberry Pi Hub                          │
+│                                                                │
 │  ┌──────────────────┐     ┌────────────────────────────────┐   │
 │  │  Home Assistant  │────▶│  SafeHome Bridge (Python)      │   │
 │  │  + Zigbee2MQTT   │     │  - Listens to device events    │   │
 │  │  + Mosquitto     │     │  - Publishes to Cloud MQTT     │   │
 │  └──────────────────┘     └────────────────────────────────┘   │
-│          │                              │                       │
-│  ┌───────┴───────┐                      │                       │
-│  │ Zigbee Dongle │                      │ MQTT over TLS         │
-│  │ (Coordinator) │                      │ (Port 8883)           │
-│  └───────────────┘                      │                       │
+│          │                              │                      │
+│  ┌───────┴───────┐                      │                      │
+│  │ Zigbee Dongle │                      │ MQTT over TLS        │
+│  │ (Coordinator) │                      │ (Port 8883)          │
+│  └───────────────┘                      │                      │
 └────────────────────────────────────────────────────────────────┘
            │                              │
            │ Zigbee Protocol              │
