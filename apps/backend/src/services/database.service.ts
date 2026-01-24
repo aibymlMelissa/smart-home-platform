@@ -7,7 +7,7 @@ class Database {
   async initialize(): Promise<void> {
     try {
       // Support Railway's DATABASE_URL format or individual env vars
-      const connectionString = process.env.DATABASE_URL;
+      const connectionString = process.env.DATABASE_URL?.trim();
 
       const poolConfig = connectionString
         ? {

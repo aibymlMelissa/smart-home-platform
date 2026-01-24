@@ -7,7 +7,7 @@ class RedisClient {
   async initialize(): Promise<void> {
     try {
       // Support Railway's REDIS_URL format or individual env vars
-      const redisUrl = process.env.REDIS_URL;
+      const redisUrl = process.env.REDIS_URL?.trim();
 
       if (redisUrl) {
         this.client = new Redis(redisUrl, {

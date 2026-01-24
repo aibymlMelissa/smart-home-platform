@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 // Support Railway's DATABASE_URL format or individual env vars
-const connectionString = process.env.DATABASE_URL;
+const connectionString = process.env.DATABASE_URL?.trim();
 
 // Log connection info for debugging (mask password)
 console.log('Database configuration:', {
