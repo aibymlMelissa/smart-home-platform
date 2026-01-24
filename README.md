@@ -1,6 +1,6 @@
 # SafeHome Platform
 
-A smart home automation platform with aged care monitoring, designed for the Melbourne market. Please click on either the UserInterface know how Households interface with the safe home services and how resellers work with their hub and link with purchase, installation, remote monitoring and maintenance services
+A smart home automation platform with aged care monitoring, designed for the Melbourne market. Please click on either the UserInterface know how Households interface with the safe home services or Reseller how resellers work with their hub and link with purchase, installation, remote monitoring and maintenance services with UseInterface.
 
 
 ## Architecture
