@@ -13,7 +13,7 @@ A smart home automation platform with aged care monitoring, designed for the Mel
 │  │  Home Assistant  │────▶│  SafeHome Bridge (Python)      │   │
 │  │  + Zigbee2MQTT   │     │  - Listens to device events    │   │
 │  │  + Mosquitto     │     │  - Publishes to Cloud MQTT     |   |
-|  │                  │     |  - AI Pattern Recongie Alert   |   |
+|  │                  │     |  - AI Pattern Recongise Alert  |   |
 │  └──────────────────┘     └────────────────────────────────┘   │
 │          │                              │                      │
 │  ┌───────┴───────┐                      │                      │
