@@ -6,17 +6,31 @@ class Database {
 
   async initialize(): Promise<void> {
     try {
-      this.pool = new Pool({
-        host: process.env.DB_HOST || 'localhost',
-        port: parseInt(process.env.DB_PORT || '5432', 10),
-        database: process.env.DB_NAME || 'smarthome',
-        user: process.env.DB_USER || 'postgres',
-        password: process.env.DB_PASSWORD,
-        min: parseInt(process.env.DB_POOL_MIN || '2', 10),
-        max: parseInt(process.env.DB_POOL_MAX || '10', 10),
-        idleTimeoutMillis: 30000,
-        connectionTimeoutMillis: 2000,
-      });
+      // Support Railway's DATABASE_URL format or individual env vars
+      const connectionString = process.env.DATABASE_URL;
+
+      const poolConfig = connectionString
+        ? {
+            connectionString,
+            ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : undefined,
+            min: parseInt(process.env.DB_POOL_MIN || '2', 10),
+            max: parseInt(process.env.DB_POOL_MAX || '10', 10),
+            idleTimeoutMillis: 30000,
+            connectionTimeoutMillis: 10000,
+          }
+        : {
+            host: process.env.DB_HOST || 'localhost',
+            port: parseInt(process.env.DB_PORT || '5432', 10),
+            database: process.env.DB_NAME || 'smarthome',
+            user: process.env.DB_USER || 'postgres',
+            password: process.env.DB_PASSWORD,
+            min: parseInt(process.env.DB_POOL_MIN || '2', 10),
+            max: parseInt(process.env.DB_POOL_MAX || '10', 10),
+            idleTimeoutMillis: 30000,
+            connectionTimeoutMillis: 10000,
+          };
+
+      this.pool = new Pool(poolConfig);
 
       // Test connection
       const client = await this.pool.connect();

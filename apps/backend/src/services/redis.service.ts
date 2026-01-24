@@ -6,16 +6,29 @@ class RedisClient {
 
   async initialize(): Promise<void> {
     try {
-      this.client = new Redis({
-        host: process.env.REDIS_HOST || 'localhost',
-        port: parseInt(process.env.REDIS_PORT || '6379', 10),
-        password: process.env.REDIS_PASSWORD || undefined,
-        db: parseInt(process.env.REDIS_DB || '0', 10),
-        retryStrategy: (times) => {
-          const delay = Math.min(times * 50, 2000);
-          return delay;
-        },
-      });
+      // Support Railway's REDIS_URL format or individual env vars
+      const redisUrl = process.env.REDIS_URL;
+
+      if (redisUrl) {
+        this.client = new Redis(redisUrl, {
+          maxRetriesPerRequest: 3,
+          retryStrategy: (times) => {
+            const delay = Math.min(times * 50, 2000);
+            return delay;
+          },
+        });
+      } else {
+        this.client = new Redis({
+          host: process.env.REDIS_HOST || 'localhost',
+          port: parseInt(process.env.REDIS_PORT || '6379', 10),
+          password: process.env.REDIS_PASSWORD || undefined,
+          db: parseInt(process.env.REDIS_DB || '0', 10),
+          retryStrategy: (times) => {
+            const delay = Math.min(times * 50, 2000);
+            return delay;
+          },
+        });
+      }
 
       this.client.on('connect', () => {
         logger.info('Redis connected successfully');
