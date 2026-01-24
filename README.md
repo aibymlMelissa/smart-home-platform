@@ -142,9 +142,9 @@ npm run reseller-hub:dev # http://localhost:3001
 
 | Document | Description |
 |----------|-------------|
-| [README_detail.md](./docs/README_detail.md) | Full documentation with architecture diagrams |
-| [CLAUDE_detail.md](./docs/CLAUDE_detail.md) | Detailed development guide |
-| [HubSetUp.md](./HubSetUp.md) | Raspberry Pi hub integration guide |
+| README_detail.md | Full documentation with architecture diagrams |
+| CLAUDE_detail.md | Detailed development guide |
+| HubSetUp.md | Raspberry Pi hub integration guide |
 
 ## Key Features
 
