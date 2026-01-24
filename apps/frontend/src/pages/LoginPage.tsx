@@ -186,7 +186,7 @@ export default function LoginPage() {
           {/* Back to Welcome */}
           <div className="mt-4 text-center">
             <Link to="/welcome" className="text-base text-gray-400 hover:text-white transition-colors">
-              ← Back to Home
+              ← Back to Home Page
             </Link>
           </div>
         </div>
