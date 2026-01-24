@@ -2,6 +2,53 @@
 
 A smart home automation platform with aged care monitoring, designed for the Melbourne market. Please clhub ick on either the UserInterface know how Households interface with the safe home services and how resellers work with their hub and link with purchase, installation, remote monitoring and maintenance services
 
+
+## Architecture
+
+```
+┌────────────────────────────────────────────────────────────────┐
+│                      Raspberry Pi Hub                           │
+│                                                                  │
+│  ┌──────────────────┐     ┌────────────────────────────────┐   │
+│  │  Home Assistant  │────▶│  SafeHome Bridge (Python)      │   │
+│  │  + Zigbee2MQTT   │     │  - Listens to device events    │   │
+│  │  + Mosquitto     │     │  - Publishes to Cloud MQTT     │   │
+│  └──────────────────┘     └────────────────────────────────┘   │
+│          │                              │                       │
+│  ┌───────┴───────┐                      │                       │
+│  │ Zigbee Dongle │                      │ MQTT over TLS         │
+│  │ (Coordinator) │                      │ (Port 8883)           │
+│  └───────────────┘                      │                       │
+└────────────────────────────────────────────────────────────────┘
+           │                              │
+           │ Zigbee Protocol              │
+           ▼                              ▼
+┌─────────────────────┐       ┌─────────────────────────────────┐
+│   Smart Devices     │       │   Cloud MQTT Broker             │
+│   - Motion Sensors  │       │   (HiveMQ Cloud / CloudMQTT)    │
+│   - Door Sensors    │       └─────────────────────────────────┘
+│   - Panic Button    │                   │
+│   - Temp Sensors    │                   │ MQTT Subscribe
+│   - Smart Plugs     │                   ▼
+└─────────────────────┘       ┌─────────────────────────────────┐
+                              │   SafeHome Backend (Railway)    │
+                              │   - Activity detection          │
+                              │   - Anomaly detection           │
+                              │   - Alert generation            │
+                              │   - Family notifications        │
+                              └─────────────────────────────────┘
+                                          │
+                                          │ WebSocket / REST API
+                                          ▼
+                              ┌─────────────────────────────────┐
+                              │   Family Dashboard (Vercel)     │
+                              │   - Real-time activity view     │
+                              │   - Alert management            │
+                              │   - Check-in status             │
+                              └─────────────────────────────────┘
+```
+
+---
 ## Applications
 
 | App | Description | URL |
