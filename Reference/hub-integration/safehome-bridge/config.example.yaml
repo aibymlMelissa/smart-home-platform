@@ -1,0 +1,106 @@
+# SafeHome Bridge Configuration
+# Copy this to config.yaml and update with your settings
+
+# Unique identifier for this hub (must match SafeHome registration)
+hub_serial: "SH-HUB-001"
+
+# Cloud MQTT Broker (connects to SafeHome backend)
+cloud_mqtt:
+  broker: "your-cluster.hivemq.cloud"  # Your cloud MQTT broker
+  port: 8883                            # TLS port
+  username: "your-username"
+  password: "your-password"
+
+# Local MQTT Broker (Home Assistant Mosquitto add-on)
+local_mqtt:
+  enabled: true
+  broker: "localhost"  # or "homeassistant.local" if running separately
+  port: 1883
+  username: ""         # Usually not needed for local
+  password: ""
+
+# Home Assistant API (for advanced integrations)
+home_assistant:
+  url: "http://localhost:8123"
+  token: "your-long-lived-access-token"  # Get from HA Profile page
+
+# Heartbeat interval in seconds
+heartbeat_interval: 300  # 5 minutes
+
+# Device Mappings
+# Map your Zigbee/Z-Wave devices to SafeHome room/type
+device_mappings:
+  # Motion sensors
+  "living_room_motion":
+    type: "motion_sensor"
+    room: "Living Room"
+    sensor_type: "motion"
+
+  "bedroom_motion":
+    type: "motion_sensor"
+    room: "Bedroom"
+    sensor_type: "motion"
+
+  "bathroom_motion":
+    type: "motion_sensor"
+    room: "Bathroom"
+    sensor_type: "motion"
+
+  "kitchen_motion":
+    type: "motion_sensor"
+    room: "Kitchen"
+    sensor_type: "motion"
+
+  # Door/Window sensors
+  "front_door":
+    type: "door_sensor"
+    room: "Entrance"
+    sensor_type: "door"
+
+  "back_door":
+    type: "door_sensor"
+    room: "Kitchen"
+    sensor_type: "door"
+
+  # Emergency button
+  "panic_button":
+    type: "button"
+    room: "Living Room"
+    is_emergency_button: true
+
+  # Check-in button ("I'm Okay" button)
+  "im_okay_button":
+    type: "button"
+    room: "Living Room"
+    is_checkin_button: true
+
+  # Temperature/Humidity sensors
+  "living_room_climate":
+    type: "climate_sensor"
+    room: "Living Room"
+    sensor_type: "temperature"
+
+  # Smart plugs (for appliance monitoring)
+  "kettle_plug":
+    type: "smart_plug"
+    room: "Kitchen"
+    appliance: "kettle"
+
+  "tv_plug":
+    type: "smart_plug"
+    room: "Living Room"
+    appliance: "tv"
+
+# Activity monitoring settings
+activity_monitoring:
+  # Rooms to monitor for activity
+  monitored_rooms:
+    - "Living Room"
+    - "Kitchen"
+    - "Bedroom"
+    - "Bathroom"
+
+  # Appliances that indicate activity when used
+  activity_appliances:
+    - "kettle_plug"
+    - "tv_plug"

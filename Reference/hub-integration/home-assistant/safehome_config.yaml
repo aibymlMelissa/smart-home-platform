@@ -1,0 +1,214 @@
+# SafeHome Hub Configuration for Home Assistant
+# Add this to your configuration.yaml or as a package
+
+# ============================================
+# MQTT Configuration
+# ============================================
+mqtt:
+  broker: your-mqtt-broker.com  # Use a cloud MQTT broker like HiveMQ, CloudMQTT, or self-hosted
+  port: 8883
+  username: !secret mqtt_username
+  password: !secret mqtt_password
+  client_id: safehome-hub-001  # Your unique hub serial number
+
+# ============================================
+# Input Helpers for Hub State
+# ============================================
+input_text:
+  safehome_hub_serial:
+    name: SafeHome Hub Serial
+    initial: "SH-HUB-001"  # Set your unique serial number
+
+input_boolean:
+  safehome_connected:
+    name: SafeHome Connected
+    initial: false
+
+# ============================================
+# Template Sensors for SafeHome
+# ============================================
+template:
+  - sensor:
+      - name: "SafeHome Hub Status"
+        state: >
+          {% if is_state('input_boolean.safehome_connected', 'on') %}
+            online
+          {% else %}
+            offline
+          {% endif %}
+
+# ============================================
+# Automations - Send Events to SafeHome
+# ============================================
+automation:
+  # Send hub status every 5 minutes
+  - id: safehome_hub_heartbeat
+    alias: "SafeHome: Hub Heartbeat"
+    trigger:
+      - platform: time_pattern
+        minutes: "/5"
+    action:
+      - service: mqtt.publish
+        data:
+          topic: "safehome/{{ states('input_text.safehome_hub_serial') }}/status"
+          payload: >
+            {
+              "serialNumber": "{{ states('input_text.safehome_hub_serial') }}",
+              "status": "online",
+              "firmwareVersion": "1.0.0",
+              "batteryLevel": 100,
+              "isOnBattery": false,
+              "wifiStrength": {{ state_attr('sensor.system_monitor_processor_use', 'value') | default(75) }},
+              "timestamp": "{{ utcnow().isoformat() }}Z"
+            }
+          retain: true
+
+  # Motion sensor triggered
+  - id: safehome_motion_detected
+    alias: "SafeHome: Motion Detected"
+    trigger:
+      - platform: state
+        entity_id:
+          - binary_sensor.living_room_motion
+          - binary_sensor.bedroom_motion
+          - binary_sensor.bathroom_motion
+          - binary_sensor.kitchen_motion
+        to: "on"
+    action:
+      - service: mqtt.publish
+        data:
+          topic: "safehome/{{ states('input_text.safehome_hub_serial') }}/event"
+          payload: >
+            {
+              "hubId": "{{ states('input_text.safehome_hub_serial') }}",
+              "deviceId": "{{ trigger.entity_id }}",
+              "eventType": "motion_detected",
+              "roomName": "{{ state_attr(trigger.entity_id, 'friendly_name') | replace(' Motion', '') }}",
+              "sensorData": {
+                "motion": true,
+                "occupancy": true
+              },
+              "timestamp": "{{ utcnow().isoformat() }}Z"
+            }
+
+  # Door/window sensor
+  - id: safehome_door_opened
+    alias: "SafeHome: Door Opened"
+    trigger:
+      - platform: state
+        entity_id:
+          - binary_sensor.front_door
+          - binary_sensor.back_door
+          - binary_sensor.bedroom_window
+        to: "on"
+    action:
+      - service: mqtt.publish
+        data:
+          topic: "safehome/{{ states('input_text.safehome_hub_serial') }}/event"
+          payload: >
+            {
+              "hubId": "{{ states('input_text.safehome_hub_serial') }}",
+              "deviceId": "{{ trigger.entity_id }}",
+              "eventType": "door_opened",
+              "roomName": "{{ state_attr(trigger.entity_id, 'friendly_name') | replace(' Door', '') | replace(' Window', '') }}",
+              "sensorData": {
+                "open": true
+              },
+              "timestamp": "{{ utcnow().isoformat() }}Z"
+            }
+
+  # Emergency button pressed
+  - id: safehome_emergency
+    alias: "SafeHome: Emergency Button"
+    trigger:
+      - platform: state
+        entity_id:
+          - binary_sensor.emergency_button
+          - input_button.emergency_call
+        to: "on"
+    action:
+      - service: mqtt.publish
+        data:
+          topic: "safehome/{{ states('input_text.safehome_hub_serial') }}/emergency"
+          payload: >
+            {
+              "hubId": "{{ states('input_text.safehome_hub_serial') }}",
+              "source": "physical_button",
+              "location": "{{ state_attr(trigger.entity_id, 'friendly_name') | default('Living Room') }}",
+              "timestamp": "{{ utcnow().isoformat() }}Z"
+            }
+          qos: 2
+
+  # Daily check-in button
+  - id: safehome_checkin
+    alias: "SafeHome: Daily Check-in"
+    trigger:
+      - platform: state
+        entity_id: input_button.im_okay_button
+    action:
+      - service: mqtt.publish
+        data:
+          topic: "safehome/{{ states('input_text.safehome_hub_serial') }}/checkin"
+          payload: >
+            {
+              "hubId": "{{ states('input_text.safehome_hub_serial') }}",
+              "type": "manual",
+              "status": "okay",
+              "timestamp": "{{ utcnow().isoformat() }}Z"
+            }
+
+  # Temperature/humidity updates (every 15 minutes)
+  - id: safehome_environment
+    alias: "SafeHome: Environment Update"
+    trigger:
+      - platform: time_pattern
+        minutes: "/15"
+    action:
+      - service: mqtt.publish
+        data:
+          topic: "safehome/{{ states('input_text.safehome_hub_serial') }}/event"
+          payload: >
+            {
+              "hubId": "{{ states('input_text.safehome_hub_serial') }}",
+              "deviceId": "sensor.living_room_temperature",
+              "eventType": "environment_reading",
+              "roomName": "Living Room",
+              "sensorData": {
+                "temperature": {{ states('sensor.living_room_temperature') | float(22) }},
+                "humidity": {{ states('sensor.living_room_humidity') | float(50) }}
+              },
+              "timestamp": "{{ utcnow().isoformat() }}Z"
+            }
+
+# ============================================
+# Scripts for Manual Actions
+# ============================================
+script:
+  safehome_send_emergency:
+    alias: "Send Emergency Alert"
+    sequence:
+      - service: mqtt.publish
+        data:
+          topic: "safehome/{{ states('input_text.safehome_hub_serial') }}/emergency"
+          payload: >
+            {
+              "hubId": "{{ states('input_text.safehome_hub_serial') }}",
+              "source": "manual",
+              "location": "Unknown",
+              "timestamp": "{{ utcnow().isoformat() }}Z"
+            }
+          qos: 2
+
+  safehome_im_okay:
+    alias: "I'm Okay Check-in"
+    sequence:
+      - service: mqtt.publish
+        data:
+          topic: "safehome/{{ states('input_text.safehome_hub_serial') }}/checkin"
+          payload: >
+            {
+              "hubId": "{{ states('input_text.safehome_hub_serial') }}",
+              "type": "manual",
+              "status": "okay",
+              "timestamp": "{{ utcnow().isoformat() }}Z"
+            }
