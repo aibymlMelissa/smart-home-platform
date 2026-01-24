@@ -6,8 +6,8 @@ A smart home automation platform with aged care monitoring, designed for the Mel
 
 | App | Description | URL |
 |-----|-------------|-----|
-| **Backend** | Express.js REST API | [Railway](https://smart-home-platform-production.up.railway.app) |
-| **Frontend** | Household Dashboard | [Vercel](https://frontend-aibymlcom.vercel.app) |
+| **System** | Express.js REST API | [Railway](https://smart-home-platform-production.up.railway.app) |
+| **User Interface (Login & HomePage)** | Household Dashboard | [Vercel](https://frontend-aibymlcom.vercel.app) |
 | **Reseller Hub** | Reseller Portal | [Vercel](https://reseller-hub-sandy.vercel.app) |
 
 ## Quick Start
@@ -29,14 +29,14 @@ npm run reseller-hub:dev # http://localhost:3001
 
 | Portal | Email | Password |
 |--------|-------|----------|
-| Frontend | demo@example.com | Demo123456 |
+| User Interface | demo@example.com | Demo123456 |
 | Reseller Hub | demo@product.com | product123 |
 | Admin | EdmundLam | Admin2@26 |
 
 ## Tech Stack
 
-- **Backend**: Node.js, Express, TypeScript, PostgreSQL, Redis
-- **Frontend**: React 18, Vite, Tailwind CSS, Zustand
+- **(System) Backend**: Node.js, Express, TypeScript, PostgreSQL, Redis
+- **(User Interface) Frontend**: React 18, Vite, Tailwind CSS, Zustand
 - **Deployment**: Railway (backend), Vercel (frontends)
 
 ## Documentation
