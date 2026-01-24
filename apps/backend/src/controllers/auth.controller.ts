@@ -471,10 +471,11 @@ export class AuthController {
    * Generate access token
    */
   private generateAccessToken(userId: string, role: string): string {
+    const expiresIn = (process.env.JWT_EXPIRES_IN || '7d') as jwt.SignOptions['expiresIn'];
     return jwt.sign(
       { userId, role },
       process.env.JWT_SECRET || 'default-secret',
-      { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+      { expiresIn }
     );
   }
 
@@ -482,10 +483,11 @@ export class AuthController {
    * Generate refresh token
    */
   private generateRefreshToken(userId: string): string {
+    const expiresIn = (process.env.JWT_REFRESH_EXPIRES_IN || '30d') as jwt.SignOptions['expiresIn'];
     return jwt.sign(
       { userId },
       process.env.JWT_SECRET || 'default-secret',
-      { expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '30d' }
+      { expiresIn }
     );
   }
 }

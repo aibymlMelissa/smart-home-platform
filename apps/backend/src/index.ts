@@ -199,7 +199,6 @@ class Server {
     // Handle hub status updates
     hubMqttService.on('hub:status', async (status) => {
       try {
-        const { DatabaseService } = await import('./services/database.service');
         await DatabaseService.query(
           `UPDATE hubs
            SET status = $2, firmware_version = $3, battery_level = $4,
@@ -228,7 +227,6 @@ class Server {
 
         // If anomaly detected, create alert
         if (result.anomaly.isAnomaly && result.anomaly.suggestedAlert) {
-          const { DatabaseService } = await import('./services/database.service');
           const hubResult = await DatabaseService.query(
             `SELECT user_id FROM hubs WHERE id = $1`,
             [event.hubId]
@@ -253,7 +251,6 @@ class Server {
     // Handle emergency alerts
     hubMqttService.on('emergency', async (emergency) => {
       try {
-        const { DatabaseService } = await import('./services/database.service');
         const hubResult = await DatabaseService.query(
           `SELECT id, user_id FROM hubs WHERE serial_number = $1 OR id = $1`,
           [emergency.hubId]
@@ -274,7 +271,6 @@ class Server {
     // Handle check-ins
     hubMqttService.on('checkin', async (checkIn) => {
       try {
-        const { DatabaseService } = await import('./services/database.service');
         const hubResult = await DatabaseService.query(
           `SELECT id, user_id FROM hubs WHERE serial_number = $1 OR id = $1`,
           [checkIn.hubId]

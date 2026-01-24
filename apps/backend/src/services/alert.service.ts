@@ -430,20 +430,61 @@ class AlertService {
     );
     const resident = residentResult.rows[0];
     const residentName = `${resident.first_name} ${resident.last_name}`;
+    const dashboardUrl = `${process.env.FRONTEND_URL}/family/${alert.userId}`;
+
+    const severityColors: Record<string, string> = {
+      low: '#3B82F6',
+      medium: '#F59E0B',
+      high: '#EF4444',
+      critical: '#DC2626',
+    };
+
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <style>
+          body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: ${severityColors[alert.severity] || '#3B82F6'}; color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+          .content { background: #f9fafb; padding: 30px; border: 1px solid #e5e7eb; border-top: none; }
+          .button { display: inline-block; background: #2563eb; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; margin: 20px 0; }
+          .footer { text-align: center; padding: 20px; color: #6b7280; font-size: 14px; }
+          .alert-box { background: white; border-left: 4px solid ${severityColors[alert.severity] || '#3B82F6'}; padding: 15px; margin: 15px 0; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>SafeHome Alert</h1>
+          </div>
+          <div class="content">
+            <p>Hello ${member.name},</p>
+            <p>An alert has been triggered for <strong>${residentName}</strong>.</p>
+            <div class="alert-box">
+              <h3 style="margin: 0 0 10px 0;">${alert.title}</h3>
+              <p style="margin: 0; color: #666;">${alert.message || ''}</p>
+              <p style="margin: 10px 0 0 0; font-size: 12px; color: #999;">
+                Severity: ${alert.severity.toUpperCase()} | Time: ${alert.createdAt.toLocaleString()}
+              </p>
+            </div>
+            <p style="text-align: center;">
+              <a href="${dashboardUrl}" class="button">View Dashboard</a>
+            </p>
+          </div>
+          <div class="footer">
+            <p>&copy; ${new Date().getFullYear()} SafeHome. All rights reserved.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
 
     await emailService.sendEmail({
       to: member.email,
       subject: `SafeHome Alert: ${alert.title}`,
-      template: 'alert',
-      data: {
-        memberName: member.name,
-        residentName,
-        alertTitle: alert.title,
-        alertMessage: alert.message || '',
-        severity: alert.severity,
-        timestamp: alert.createdAt.toLocaleString(),
-        dashboardUrl: `${process.env.FRONTEND_URL}/family/${alert.userId}`,
-      },
+      html,
     });
   }
 
