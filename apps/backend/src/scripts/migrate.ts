@@ -6,6 +6,12 @@ dotenv.config();
 // Support Railway's DATABASE_URL format or individual env vars
 const connectionString = process.env.DATABASE_URL;
 
+// Log connection info for debugging (mask password)
+console.log('Database configuration:', {
+  DATABASE_URL: connectionString ? connectionString.replace(/:([^@]+)@/, ':****@') : 'not set',
+  DB_HOST: process.env.DB_HOST || 'localhost (default)',
+});
+
 const poolConfig = connectionString
   ? {
       connectionString,
